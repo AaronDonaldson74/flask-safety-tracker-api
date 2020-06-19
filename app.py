@@ -14,19 +14,15 @@ ma = Marshmallow(app)
 
 class IncidentForm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    pub_date = db.Column(db.DateTime, nullable=False,
-        default=datetime.utcnow)
-    author = db.Column(db.Integer, db.ForeignKey('user.id'),
-        nullable=False)
+    pub_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     ppe = db.Column(db.String(200), nullable=True)
     conditions = db.Column(db.String(200), nullable=True)
     equipment = db.Column(db.String(200), nullable=True)
     others = db.Column(db.String(200), nullable=True)
     meds = db.Column(db.String(200), nullable=True)
     description = db.Column(db.String, nullable=False)
-
-    user = db.relationship('User',
-        backref=db.backref('IncidentForms', lazy=True))
+    user = db.relationship('User', backref=db.backref('incidentForms', lazy=True))
 
     def __init__(self, author, ppe, conditions, equipment, others, meds, description):
         self.author = author
@@ -59,7 +55,6 @@ class IncidentFormSchema(ma.Schema):
             "others",
             "meds",
             "description",
-            "user"
         )
 
 class UserSchema(ma.Schema):
@@ -84,31 +79,6 @@ def hello_world():
     # output = incidentForm_schema.dump().data
     # return jsonify({'user' : output})
 
-@app.route("/incidentForm", methods=["POST"])
-def add_incidentForm():
-    author = request.json["author"]
-    ppe = request.json["ppe"],
-    conditions = request.json["conditions"],
-    equipment = request.json["equipment"],
-    others = request.json["others"],
-    meds = request.json["meds"],
-    description = request.json["description"],
-
-    new_incidentForm = IncidentForm(
-            author,
-            ppe,
-            conditions,
-            equipment,
-            others,
-            meds,
-            description)
-
-    db.session.add(new_incidentForm)
-    db.session.commit()
-
-    incidentForm = IncidentForm.query.get(new_incidentForm.id)
-    return incidentForm_schema.jsonify(incidentForm)
-
 @app.route("/user", methods=["POST"])
 def add_user():
   user_name = request.json["user_name"]
@@ -129,6 +99,33 @@ def get_users():
     result = users_schema.dump(all_users)
 
     return jsonify(result)
+
+@app.route("/incidentForm", methods=["POST"])
+def add_incidentForm():
+    author = request.json["author"]
+    ppe = request.json["ppe"]
+    conditions = request.json["conditions"]
+    equipment = request.json["equipment"]
+    others = request.json["others"]
+    meds = request.json["meds"]
+    description = request.json["description"]
+
+    new_incidentForm = IncidentForm(
+            author,
+            ppe,
+            conditions,
+            equipment,
+            others,
+            meds,
+            description)
+
+    db.session.add(new_incidentForm)
+    db.session.commit()
+
+    incidentForm = IncidentForm.query.get(new_incidentForm.id)
+    return incidentForm_schema.jsonify(incidentForm)
+
+
 
 @app.route("/incidentForms", methods=["GET"])
 def get_incident_forms():
