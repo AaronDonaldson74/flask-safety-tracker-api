@@ -125,14 +125,50 @@ def add_incidentForm():
     incidentForm = IncidentForm.query.get(new_incidentForm.id)
     return incidentForm_schema.jsonify(incidentForm)
 
-
-
 @app.route("/incidentForms", methods=["GET"])
-def get_incident_forms():
-    all_incident_forms = IncidentForm.query.all()
-    result = incidentForms_schema.dump(all_incident_forms)
+def get_incidentForms():
+    all_incidentForms = IncidentForm.query.all()
+    result = incidentForms_schema.dump(all_incidentForms)
 
     return jsonify(result)
+
+@app.route("/user/<id>", methods=["PATCH"])
+def update_user(id):
+    user = User.query.get(id)
+
+    new_user_name = request.json["user_name"]
+    new_department = request.json["department"]
+    new_admin = request.json["admin"]
+
+    user.user_name = new_user_name
+    user.department = new_department
+    user.admin = new_admin
+
+    db.session.commit()
+    return user_schema.jsonify(user)
+
+@app.route("/incidentForm/<id>", methods=["PATCH"])
+def update_incidentForm(id):
+    incidentForm = IncidentForm.query.get(id)
+
+    new_author = request.json["author"]
+    new_ppe = request.json["ppe"]
+    new_conditions = request.json["conditions"]
+    new_equipment = request.json["equipment"]
+    new_others = request.json["others"]
+    new_meds = request.json["meds"]
+    new_description = request.json["description"]
+    
+    incidentForm.author = new_author
+    incidentForm.ppe = new_ppe
+    incidentForm.conditions = new_conditions
+    incidentForm.equipment = new_equipment
+    incidentForm.others = new_others
+    incidentForm.meds = new_meds
+    incidentForm.description = new_description
+
+    db.session.commit()
+    return incidentForm_schema.jsonify(incidentForm)
 
 
 if __name__ == "__main__":
