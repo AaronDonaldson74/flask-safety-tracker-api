@@ -73,12 +73,6 @@ users_schema = UserSchema(many=True)
 incidentForm_schema = IncidentFormSchema()
 incidentForms_schema = IncidentFormSchema(many=True)
 
-@app.route("/")
-def hello_world():
-    return "Hello, World!"
-    # output = incidentForm_schema.dump().data
-    # return jsonify({'user' : output})
-
 @app.route("/user", methods=["POST"])
 def add_user():
   user_name = request.json["user_name"]
