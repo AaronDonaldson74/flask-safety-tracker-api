@@ -173,7 +173,7 @@ def update_incidentForm(id):
 @app.route("/user/<id>", methods=["DELETE"])
 def delete_user(id):
     user = User.query.get(id)
-    
+
     db.session.delete(user)
     db.session.commit()
 
@@ -185,6 +185,8 @@ def delete_incidentForm(id):
 
     db.session.delete(incidentForm)
     db.session.commit()
+
+    return jsonify("Form Deleted!")
 
 if __name__ == "__main__":
     app.debug = True
