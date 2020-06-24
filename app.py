@@ -1,16 +1,22 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_bcrypt import Bcrypt
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+from flask_cors import CORS
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY')
+app.permanent_session_lifetime = timedelta(minutes=10)
+CORS(app, supports_credentials=True)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+fb = Bcrypt(app)
 
 class IncidentForm(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,14 +41,11 @@ class IncidentForm(db.Model):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    user_name = db.Column(db.String(50), nullable=False)
+    user_name = db.Column(db.String(80), nullable=False, unique=True)
+    password = db.Column(db.String(200), nullable=False)
     department = db.Column(db.Integer, nullable=False)
     admin = db.Column(db.Boolean, nullable=False)
 
-    def __init__(self, user_name, department, admin):
-        self.user_name = user_name
-        self.department = department
-        self.admin = admin
 
 class IncidentFormSchema(ma.Schema):
     class Meta:
@@ -73,13 +76,20 @@ users_schema = UserSchema(many=True)
 incidentForm_schema = IncidentFormSchema()
 incidentForms_schema = IncidentFormSchema(many=True)
 
-@app.route("/user", methods=["POST"])
+# Creates a user profile.
+@app.route("/user/register", methods=["POST"])
 def add_user():
   user_name = request.json["user_name"]
+  password = request.json["password"]
   department = request.json["department"]
   admin = request.json["admin"]
 
-  new_user = User(user_name, department, admin)
+  hashed_password = fb.generate_password_hash(password).decode('utf-8')
+
+  new_user = User(user_name=user_name,
+  password=hashed_password,
+  department=department,
+  admin=admin)
 
   db.session.add(new_user)
   db.session.commit()
@@ -87,6 +97,7 @@ def add_user():
   user = User.query.get(new_user.id)
   return user_schema.jsonify(user)
 
+#This route for testing purposes.
 @app.route("/users", methods=["GET"])
 def get_users():
     all_users = User.query.all()
@@ -94,6 +105,29 @@ def get_users():
 
     return jsonify(result)
 
+#This route for login authentication.
+@app.route('/user/login', methods=["POST"])
+def login():
+    post_data = request.get_json()
+    db_user = User.query.filter_by(user_name=post_data.get('user_name')).first()
+    
+    if db_user is None:
+        return jsonify('Username Not Found')
+
+    user_name = post_data.get('user_name')
+    password = post_data.get('password')
+    db_user_hashed_password = db_user.password
+    valid_password = fb.check_password_hash(db_user_hashed_password, password)
+
+    if valid_password:
+        return jsonify({
+            "userInfo": user_schema.dump(db_user),
+            "message": "User Verified"
+        })
+    
+    return jsonify("I'm sorry, that password is not correct")
+
+#This route is for posting an incident form.
 @app.route("/incidentForm", methods=["POST"])
 def add_incidentForm():
     author = request.json["author"]
