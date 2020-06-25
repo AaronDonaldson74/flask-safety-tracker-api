@@ -58,7 +58,8 @@ $ git remote -v
 - Create a .env file in the root.
 - Set a variable named DATABASE_URI and paste the URI for future reference.
 - Back in the api code, change the app line to read
-- app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URI")
+- app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
+- make sure it's URL not URI. 
 - put .env into the .gitignore file.
 
 ## Install dependancy
