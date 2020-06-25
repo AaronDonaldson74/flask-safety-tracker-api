@@ -116,7 +116,7 @@ https://github.com/mars/create-react-app-buildpack
 - Head back to your terminal and paste in the code you just copied
 ```
 $ git status
-$ heroku git:remote -a df-flask-todo-api
+$ heroku git:remote -a df-flask-todo-client
 ```
 - Make sure heroku has been added as a remote
 ```
