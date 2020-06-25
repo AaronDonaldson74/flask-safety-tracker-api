@@ -3,13 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY')
-app.permanent_session_lifetime = timedelta(minutes=10)
-CORS(app, supports_credentials=True)
+CORS(app, )
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")

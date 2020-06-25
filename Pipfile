@@ -9,6 +9,9 @@ verify_ssl = true
 flask = "*"
 flask-sqlalchemy = "*"
 flask-marshmallow = "*"
+flask-heroku = "*"
+psycopg2-binary = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"
