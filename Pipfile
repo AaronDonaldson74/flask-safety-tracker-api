@@ -13,6 +13,7 @@ flask-heroku = "*"
 gunicorn = "*"
 python-dotenv = "*"
 psycopg2 = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.8"
