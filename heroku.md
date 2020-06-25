@@ -49,12 +49,21 @@ $ git remote -v
 ```
 ​
 ## Create A Postgres DB on Heroku
-- Click configure addons
+- Click configure addons from the Overview tab.
 - Search for postgres
 - After it adds postgress, click on the icon to go to the database
 - Go to settings
 - View credentials
 - Copy the URI
+- Create a .env file in the root.
+- Set a variable named DATABASE_URI and paste the URI for future reference.
+- Back in the api code, change the app line to read
+- app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URI")
+- put .env into the .gitignore file.
+
+## Install dependancy
+
+$ pipenv install python-dotenv
 ​
 ​
 ## Change App To Work With Heroku And Postgres
